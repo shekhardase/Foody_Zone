@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import SearchResult from "./Components/SearchResults/SearchResults";
+import LoginPage from "./Components/LoginPage"; // Ensure this import exists
 
 export const BASE_URL = "http://localhost:9000";
 
@@ -10,6 +11,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedBtn, setSelectedBtn] = useState("all");
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const fetchFoodData = async () => {
@@ -17,7 +19,6 @@ const App = () => {
 
       try {
         const response = await fetch(BASE_URL);
-
         const json = await response.json();
 
         setData(json);
@@ -25,15 +26,15 @@ const App = () => {
         setLoading(false);
       } catch (error) {
         setError("Unable to fetch data");
+        setLoading(false);
       }
     };
+
     fetchFoodData();
   }, []);
 
   const searchFood = (e) => {
     const searchValue = e.target.value;
-
-    console.log(searchValue);
 
     if (searchValue === "") {
       setFilteredData(null);
@@ -60,26 +61,14 @@ const App = () => {
   };
 
   const filterBtns = [
-    {
-      name: "All",
-      type: "all",
-    },
-    {
-      name: "Breakfast",
-      type: "breakfast",
-    },
-    {
-      name: "Lunch",
-      type: "lunch",
-    },
-    {
-      name: "Dinner",
-      type: "dinner",
-    },
+    { name: "All", type: "all" },
+    { name: "Breakfast", type: "breakfast" },
+    { name: "Lunch", type: "lunch" },
+    { name: "Dinner", type: "dinner" },
   ];
 
   if (error) return <div>{error}</div>;
-  if (loading) return <div>loading.....</div>;
+  if (loading) return <div>Loading.....</div>;
 
   return (
     <>
@@ -104,9 +93,14 @@ const App = () => {
               {value.name}
             </Button>
           ))}
+          <Button onClick={() => setShowLogin(true)}>Login</Button>
         </FilterContainer>
       </Container>
+
       <SearchResult data={filteredData} />
+
+      {/* Render LoginPage if showLogin is true */}
+      {showLogin && <LoginPage onClose={() => setShowLogin(false)} />}
     </>
   );
 };
@@ -117,6 +111,7 @@ export const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
 `;
+
 const TopContainer = styled.section`
   height: 140px;
   display: flex;
